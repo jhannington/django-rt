@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django-RT chat</title>
+
+    <style>
+        #chat {
+            width: 600px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>#{{ view.room }}</h1>
+
+<div id="chat"></div>
+
+<form id="msgForm" onsubmit="submitMsg(); return false">
+    <label>
+        User
+        <input name="user" />
+    </label>
+    <label>
+        Message
+        <input name="msg" />
+    </label>
+    <button>Send</button>
+</form>
+
+<script>
+    room = '{{ view.room }}';
+    roomRoute = '/chat/'+room+'/messages'
+
+    function processMsg(msg) {
+        // Add a message to the chat window
+        var msgEl = document.createElement('p');
+        var userEl = document.createElement('b');
+        userEl.innerText = msg.user;
+        msgEl.appendChild(userEl);
+        msgEl.appendChild(document.createTextNode(': '+msg.msg));
+
+        var chatEl = document.getElementById('chat');
+        chatEl.appendChild(msgEl);
+    }
+
+    function submitMsg() {
+        // POST the new chat message to the server
+        var form = document.getElementById('msgForm');
+
+        var msgObj = {
+            user: form.user.value,
+            msg: form.msg.value
+        };
+
+        var req = new XMLHttpRequest();
+        req.open('POST', roomRoute, true);
+        req.send(JSON.stringify(msgObj));
+
+        return false;
+    }
+
+    (function() {
+        // Get existing chat messages
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = function() {
+            if(req.readyState === XMLHttpRequest.DONE) {
+                if(req.status === 200) {
+                    // Process chat room messages
+                    var msgs = JSON.parse(req.responseText).messages;
+                    for(var i = 0; i < msgs.length; i++) {
+                        processMsg(msgs[i]);
+                    }
+                } else {
+                    // Error
+                    alert('Error whilst getting messages.');
+                }
+            }
+        };
+        req.open('GET', roomRoute, true);
+        req.send(null);
+
+        // Listen for new messages delivered via SSE
+        var evtSource = new EventSource(roomRoute+'.sse');
+        evtSource.addEventListener('message', function(e) {
+            var evt = JSON.parse(e.data);
+            console.log(evt);
+            processMsg(evt.data);
+        });
+    })();
+</script>
+
+</body>
+</html>
