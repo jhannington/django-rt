@@ -1,2 +1,7 @@
+0.2 (pre-alpha)
+    * Changed: renamed RT_ALLOW_ORIGIN setting to RT_CORS_ALLOW_ORIGIN
+    * Fixed: RT_CORS_ALLOW_ORIGIN setting not working when DEBUG is True
+    * Added: RT_CORS_ALLOW_CREDENTIALS setting
+
 0.1 (pre-alpha)
     * Initial release

@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django_rt.event import ResourceEvent
-from django_rt.utils import get_allow_origin_header, get_full_channel_name, verify_resource_view, generate_subscription_id, get_subscription_key, get_django_url
+from django_rt.utils import get_cors_headers, get_full_channel_name, verify_resource_view, generate_subscription_id, get_subscription_key, get_django_url
 from django_rt.resource import NotAnRtResourceError, Resource, ResourceError, ResourceRequest
 from django_rt.settings import settings
 from django_rt.sse import SseEvent, SseHeartbeat
@@ -149,9 +149,8 @@ class AsyncioCourier:
             # Prepare response
             response = web.StreamResponse()
             response.content_type = 'text/event-stream'
-            allow_origin = get_allow_origin_header(request.headers.get('Origin', None))
-            if allow_origin:
-                response.headers['Access-Control-Allow-Origin'] = allow_origin 
+            cors_hdrs = get_cors_headers(request.headers.get('Origin', None))
+            response.headers.update(cors_hdrs)
             yield from response.prepare(request)
 
             # Loop

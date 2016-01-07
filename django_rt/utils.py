@@ -31,29 +31,40 @@ class SerializableObject:
     def from_json(cls, json_data):
         return cls.deserialize(json.loads(json_data))
 
-def get_allow_origin_header(origin):
-    """Return the value for the Access-Control-Allow-Origin header, given the request origin."""
+def get_cors_headers(origin):
+    """Return dict containing the appropriate CORS headers for a courier response, given the request origin."""
 
-    # Allow any host when DEBUG is enabled
-    if settings.DEBUG:
-        return '*'
+    def get_allow_origin_header(origin):
+        """Return the value for the Access-Control-Allow-Origin header, given the request origin."""
 
-    RT_ALLOW_ORIGIN = settings.RT_ALLOW_ORIGIN
-
-    if not RT_ALLOW_ORIGIN:
-        return None
-    elif RT_ALLOW_ORIGIN == '*':
-        return '*'
-    else:
-        if type(RT_ALLOW_ORIGIN) is str:
-            allowed = (RT_ALLOW_ORIGIN,)
+        RT_CORS_ALLOW_ORIGIN = settings.RT_CORS_ALLOW_ORIGIN
+        if not RT_CORS_ALLOW_ORIGIN:
+            # Allow any host when DEBUG is enabled
+            return '*' if settings.DEBUG else None
+        elif RT_CORS_ALLOW_ORIGIN == '*':
+            return '*'
         else:
-            allowed = RT_ALLOW_ORIGIN
+            if type(RT_CORS_ALLOW_ORIGIN) is str:
+                allowed = (RT_CORS_ALLOW_ORIGIN,)
+            else:
+                allowed = RT_CORS_ALLOW_ORIGIN
 
-        if origin and origin in allowed:
-            return origin
+            if origin and origin in allowed:
+                return origin
 
-    return None
+        return None
+
+    # Build headers
+    hdrs = {}
+    allow_origin = get_allow_origin_header(origin)
+    if allow_origin:
+        hdrs['Access-Control-Allow-Origin'] = allow_origin 
+
+        if settings.RT_CORS_ALLOW_CREDENTIALS is not None:
+            hdrs['Access-Control-Allow-Credentials'] = \
+                'true' if settings.RT_CORS_ALLOW_CREDENTIALS else 'false'
+
+    return hdrs
 
 def get_full_channel_name(channel):
     return ':'.join((settings.RT_PREFIX, 'channel', channel))

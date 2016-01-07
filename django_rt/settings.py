@@ -1,7 +1,8 @@
 from django.conf import settings as dj_settings
 
 DEFAULTS = {
-    'RT_ALLOW_ORIGIN': None,
+    'RT_CORS_ALLOW_ORIGIN': None,
+    'RT_CORS_ALLOW_CREDENTIALS': None,
     'RT_PREFIX': 'rt',
     'RT_SSE_HEARTBEAT': 30, # in seconds
     'RT_REDIS_HOST': 'localhost',
