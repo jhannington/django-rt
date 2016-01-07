@@ -2,6 +2,7 @@
     * Changed: renamed RT_ALLOW_ORIGIN setting to RT_CORS_ALLOW_ORIGIN
     * Fixed: RT_CORS_ALLOW_ORIGIN setting not working when DEBUG is True
     * Added: RT_CORS_ALLOW_CREDENTIALS setting
+    * Changed: publish() now takes a channel name instead of a resource
 
 0.1 (pre-alpha)
     * Initial release

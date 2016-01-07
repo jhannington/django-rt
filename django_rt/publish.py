@@ -4,16 +4,9 @@ from django.views.generic import View
 
 from django_rt.event import ResourceEvent
 from django_rt.settings import settings
-from django_rt.utils import get_full_channel_name, verify_resource_view
+from django_rt.utils import get_full_channel_name
 
-def publish(resource, event=None, data=None, time=None, event_type=None):
-    # Use request path as resource if a View instance is given
-    if isinstance(resource, View):
-        resource = resource.request.path
-
-    # Check route resolves to an RT resource View
-    verify_resource_view(resource)
-
+def publish(channel, event=None, data=None, time=None, event_type=None):
     if data or time or event_type:
         if event:
             raise RuntimeError("publish() cannot accept 'data', 'time', or 'event_type' arguments if 'event' is specified")
@@ -27,7 +20,7 @@ def publish(resource, event=None, data=None, time=None, event_type=None):
         if not event:
             raise RuntimeError("publish() called with no event or event data")
         
-    channel = get_full_channel_name(resource)
+    redis_channel = get_full_channel_name(channel)
     event_json = event.to_json()
 
     r = redis.StrictRedis(
@@ -35,4 +28,4 @@ def publish(resource, event=None, data=None, time=None, event_type=None):
         port=settings.RT_REDIS_PORT,
         db=settings.RT_REDIS_DB
     )
-    r.publish(channel, event_json)
+    r.publish(redis_channel, event_json)

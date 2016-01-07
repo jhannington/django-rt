@@ -70,7 +70,7 @@ class ApiChatRoomMessagesView(RtResourceView):
         self.messages[room].append(msg)
 
         # Publish message to event queue
-        publish(self, data=msg)
+        publish(request.path, data=msg)
 
         # Return all messages sent to the room
         return JsonResponse({})
