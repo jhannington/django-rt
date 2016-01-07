@@ -95,13 +95,7 @@ class RtResourceView(View):
     def rt_get_path(self, request):
         """Return the path to this resource.
         Safe to block."""
-        path = request.path
-
-        # Ensure trailing slash is removed
-        if path.endswith('/'):
-            path = path[:-1]
-
-        return path
+        return request.path
 
     def rt_get_channel(self, request):
         """Return this resource's pubsub channel name.
