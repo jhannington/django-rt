@@ -4,6 +4,7 @@
     * Added: RT_CORS_ALLOW_CREDENTIALS setting
     * Changed: publish() now takes a channel name instead of a resource
     * Fixed: gevent courier not functional
+    * Added: support resource paths with trailing slashes
 
 0.1 (pre-alpha)
     * Initial release

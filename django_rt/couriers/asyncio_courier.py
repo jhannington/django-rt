@@ -87,6 +87,11 @@ class AsyncioCourier:
         res_path = request.match_info.get('resource')
         res_path = '/' + res_path
 
+        # Append slash to resource path if URL ends with slash
+        suffix = request.match_info.get('suffix')
+        if suffix.endswith('/'):
+            res_path += '/'
+
         redis_conn = None
         redis_subscription = None
         sub_id = None
@@ -190,7 +195,7 @@ class AsyncioCourier:
 
     def create_app(self, loop):
         app = web.Application(loop=loop)
-        app.router.add_route('GET', '/{resource:.+}.sse', self.handle_sse)
+        app.router.add_route('GET', r'/{resource:.+}{suffix:\.sse/?}', self.handle_sse)
         return app
 
     def run(self, addr=None, port=None, unix_socket=None, django_url=None):

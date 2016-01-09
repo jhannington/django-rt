@@ -58,8 +58,12 @@ class GeventCourier:
         else:
             raise ResourceError(resp.status)
 
-    def handle_sse(self, path, env, start_response):
+    def handle_sse(self, path, suffix, env, start_response):
         res_path = path
+
+        # Append slash to resource path if URL ends with slash
+        if suffix.endswith('/'):
+            res_path += '/'
 
         req_hdrs = self.get_headers(env)
 
@@ -164,8 +168,8 @@ class GeventCourier:
         path = m.group(1)
         suffix = m.group(2)
 
-        if suffix == 'sse':
-            return self.handle_sse(path, env, start_response)
+        if suffix == 'sse' or suffix == 'sse/':
+            return self.handle_sse(path, suffix, env, start_response)
         else:
             start_response('404 Not Found', [('Content-Type', 'text/plain')])
             return [b'Not found']
