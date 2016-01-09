@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django_rt.event import ResourceEvent
-from django_rt.utils import get_full_channel_name, get_http_status_reason, verify_resource_view, generate_subscription_id, get_subscription_key, get_django_url
+from django_rt.utils import get_full_channel_name, get_http_status_reason, verify_resource_view, generate_subscription_id, get_subscription_key, get_django_url, get_cors_headers
 from django_rt.resource import NotAnRtResourceError, Resource, ResourceError, ResourceRequest
 from django_rt.settings import settings
 from django_rt.sse import SseEvent, SseHeartbeat
@@ -35,14 +35,15 @@ class GeventCourier:
             hdrs[k[5:]] = env[k]
         return hdrs
 
-    def request_resource(self, path, sub_id, env):
+    def request_resource(self, path, sub_id, req_hdrs):
         # Prepare resource request
         res_req = ResourceRequest(path, 'subscribe',
             sub_id=sub_id
         )
-        res_req.prepare(client_headers=self.get_headers(env))
+        url = urlunparse((self._django_url.scheme, self._django_url.netloc, res_req.path, '', '', ''))
+        res_req.prepare(client_headers=req_hdrs)
         http = urllib3.PoolManager()
-        resp = http.urlopen('POST', res_req.get_url(),
+        resp = http.urlopen('POST', url,
             body=res_req.to_json(),
             headers=res_req.get_headers()
         )
@@ -60,17 +61,19 @@ class GeventCourier:
     def handle_sse(self, path, env, start_response):
         res_path = path
 
+        req_hdrs = self.get_headers(env)
+
         # Check route is a Django-RT resource
         try:
             logger.debug('Verifying %s is an RT resource' % (res_path,))
             verify_resource_view(res_path)
         except NotAnRtResourceError:
             logger.debug('Not an RT resource; aborting')
-            start_response(full_status(406), [])
+            start_response(self.full_status(406), [])
             return [b'']
         except ResourceError as e:
             logger.debug('Caught ResourceError; aborting')
-            start_response(full_status(e.status), [])
+            start_response(self.full_status(e.status), [])
             return [b'']
 
         # Connect to Redis server
@@ -91,14 +94,14 @@ class GeventCourier:
         # Request resource from Django API
         try:
             logger.debug('Requesting subscription for %s' % (res_path,))
-            res = self.request_resource(path, sub_id, env)
+            res = self.request_resource(path, sub_id, req_hdrs)
         except NotAnRtResourceError:
             logger.debug("Subscription denied: not an rt resource. This shouldn't happen...")
-            start_response(full_status(406), [])
+            start_response(self.full_status(406), [])
             return [b'']
         except ResourceError as e:
             logger.debug('Subscription denied: HTTP error %d' % (e.status,))
-            start_response(full_status(e.status), [])
+            start_response(self.full_status(e.status), [])
             return [b'']
 
         # Check subscription status and change to 'subscribed'
@@ -117,8 +120,12 @@ class GeventCourier:
         pubsub.subscribe(get_full_channel_name(res.channel))
 
         # Prepare response
-        start_response('200 OK', [('Content-Type', 'text/event-stream')])
-        #! TODO: allow origin header
+        hdrs = {
+            'Content-Type': 'text/event-stream'
+        }
+        cors_hdrs = get_cors_headers(req_hdrs.get('ORIGIN', None))
+        hdrs.update(cors_hdrs)
+        start_response('200 OK', [hdr for hdr in hdrs.items()])
 
         # Loop
         first_event = True
