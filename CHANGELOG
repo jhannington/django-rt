@@ -1,4 +1,4 @@
-0.2 (pre-alpha)
+0.2 (pre-alpha) - 2016/01/09
     * Changed: renamed RT_ALLOW_ORIGIN setting to RT_CORS_ALLOW_ORIGIN
     * Fixed: RT_CORS_ALLOW_ORIGIN setting not working when DEBUG is True
     * Added: RT_CORS_ALLOW_CREDENTIALS setting
@@ -6,5 +6,5 @@
     * Fixed: gevent courier not functional
     * Added: support resource paths with trailing slashes
 
-0.1 (pre-alpha)
+0.1 (pre-alpha) - 2015/12/01
     * Initial release
