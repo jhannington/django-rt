@@ -1,4 +1,4 @@
-0.3 - ?
+0.3 (pre-alpha) - 2016/03/05
     * Added: Redis authentication support with RT_REDIS_PASSWORD setting
     * Fixed: improved courier signal handling
     * Fixed: suppressed spammy logging when using the asyncio courier
