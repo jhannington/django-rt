@@ -1,7 +1,7 @@
 Django-RT
 =========
 
-:Current version: 0.2 pre-alpha
+:Current version: 0.3 pre-alpha
 
 Django-RT is a framework for implementing real-time APIs in Django web applications. This framework follows the traditional publish/subscribe methodology, using Redis as the pub/sub provider.
 
