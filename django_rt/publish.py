@@ -26,6 +26,7 @@ def publish(channel, event=None, data=None, time=None, event_type=None):
     r = redis.StrictRedis(
         host=settings.RT_REDIS_HOST,
         port=settings.RT_REDIS_PORT,
-        db=settings.RT_REDIS_DB
+        db=settings.RT_REDIS_DB,
+        password=settings.RT_REDIS_PASSWORD
     )
     r.publish(redis_channel, event_json)

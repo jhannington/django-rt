@@ -44,7 +44,8 @@ class RtResourceView(View):
         redis_conn = redis.StrictRedis(
             host=settings.RT_REDIS_HOST,
             port=settings.RT_REDIS_PORT,
-            db=settings.RT_REDIS_DB
+            db=settings.RT_REDIS_DB,
+            password=settings.RT_REDIS_PASSWORD
         )
 
         # Get subscription status

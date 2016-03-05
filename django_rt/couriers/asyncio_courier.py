@@ -74,7 +74,8 @@ class AsyncioCourier:
             redis_conn = yield from asyncio_redis.Connection.create(
                 host=settings.RT_REDIS_HOST,
                 port=settings.RT_REDIS_PORT,
-                db=settings.RT_REDIS_DB
+                db=settings.RT_REDIS_DB,
+                password=settings.RT_REDIS_PASSWORD
             )
 
             # Remove key
@@ -114,7 +115,8 @@ class AsyncioCourier:
             redis_conn = yield from asyncio_redis.Connection.create(
                 host=settings.RT_REDIS_HOST,
                 port=settings.RT_REDIS_PORT,
-                db=settings.RT_REDIS_DB
+                db=settings.RT_REDIS_DB,
+                password=settings.RT_REDIS_PASSWORD
             )
 
             # Create subscription
