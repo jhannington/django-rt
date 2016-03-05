@@ -1,5 +1,6 @@
 0.3 - ?
     * Fixed: improved courier signal handling
+    * Fixed: suppressed spammy logging when using the asyncio courier
 
 0.2 (pre-alpha) - 2016/01/09
     * Changed: renamed RT_ALLOW_ORIGIN setting to RT_CORS_ALLOW_ORIGIN

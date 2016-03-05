@@ -209,6 +209,9 @@ class AsyncioCourier:
         # Initialize Django
         django.setup()
 
+        # Suppress the spammy asyncio logging
+        logging.getLogger('asyncio').setLevel(logging.WARNING)
+
         # Run server
         loop = asyncio.get_event_loop()
         app = self.create_app(loop)
