@@ -17,6 +17,9 @@ from django_rt.sse import SseEvent, SseHeartbeat
 class AsyncioCourier:
     _django_url = None
 
+    def __init__(self):
+        self._ev_loop = None
+
     @asyncio.coroutine
     def request_resource(self, path, request, sub_id):
         # Prepare resource request
@@ -219,18 +222,25 @@ class AsyncioCourier:
         logger.info('Django-RT asyncio courier server running on '+listen_str)
         srv = loop.run_until_complete(f)
 
+        self._ev_loop = loop
         try:
             loop.run_forever()
         except KeyboardInterrupt:
             pass
         finally:
             # Shutdown
+            self._ev_loop = None
             logger.info('Closing connections...')
             loop.run_until_complete(handler.finish_connections(1.0))
             srv.close()
             loop.run_until_complete(srv.wait_closed())
             loop.run_until_complete(app.finish())
             loop.close()
+
+    def stop(self):
+        # Stop event loop from running
+        if self._ev_loop:
+            self._ev_loop.stop()
 
 if __name__ == '__main__':
     AsyncioCourier().run('0.0.0.0', 8080, django_url='http://localhost:10000')

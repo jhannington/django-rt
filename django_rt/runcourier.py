@@ -93,6 +93,14 @@ def main():
         except FileNotFoundError:
             pass
 
+    # Import appropriate server class and create instance
+    if args.server_type == 'asyncio':
+        from django_rt.couriers.asyncio_courier import AsyncioCourier
+        server = AsyncioCourier()
+    elif args.server_type == 'gevent':
+        from django_rt.couriers.gevent_courier import GeventCourier
+        server = GeventCourier()
+
     # Trap signals to shut down gracefully
     def quit_handler(signum, frame):
         signames = {
@@ -102,18 +110,10 @@ def main():
         }
         signal_name = signames[signum]
         logging.info('Caught %s; shutting down...' % (signal_name,))
-        sys.exit(0)
+        server.stop()
     signal.signal(signal.SIGTERM, quit_handler)
     signal.signal(signal.SIGINT, quit_handler)
     signal.signal(signal.SIGQUIT, quit_handler)
-
-    # Import appropriate server class and create instance
-    if args.server_type == 'asyncio':
-        from django_rt.couriers.asyncio_courier import AsyncioCourier
-        server = AsyncioCourier()
-    elif args.server_type == 'gevent':
-        from django_rt.couriers.gevent_courier import GeventCourier
-        server = GeventCourier()
 
     # Run server
     server.run(addr, port, unix_socket, args.django_url)

@@ -19,6 +19,9 @@ from django_rt.settings import settings
 from django_rt.sse import SseEvent, SseHeartbeat
 
 class GeventCourier:
+    def __init__(self):
+        self._wsgi_server = None
+
     @staticmethod
     def full_status(code):
         reason = get_http_status_reason(code)
@@ -186,10 +189,15 @@ class GeventCourier:
 
         logger.info('Django-RT gevent courier server running on '+':'.join([str(addr), str(port)]))
 
+        self._wsgi_server = server = WSGIServer((addr, port), self.application)
         try:
-            WSGIServer((addr, port), self.application).serve_forever()
+            server.serve_forever()
         except KeyboardInterrupt:
             pass
+
+    def stop(self):
+        # Stop WSGI server
+        self._wsgi_server.stop()
 
 if __name__ == '__main__':
     GeventCourier().run('0.0.0.0', 15000)

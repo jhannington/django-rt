@@ -1,3 +1,6 @@
+0.3 - ?
+    * Fixed: improved courier signal handling
+
 0.2 (pre-alpha) - 2016/01/09
     * Changed: renamed RT_ALLOW_ORIGIN setting to RT_CORS_ALLOW_ORIGIN
     * Fixed: RT_CORS_ALLOW_ORIGIN setting not working when DEBUG is True
