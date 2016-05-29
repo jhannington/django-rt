@@ -5,7 +5,7 @@ from importlib import import_module
 from urllib.parse import urlparse
 
 from django.core.urlresolvers import resolve, Resolver404
-from django.http.response import REASON_PHRASES
+from http.client import responses as REASON_PHRASES
 
 from django_rt.settings import settings
 
