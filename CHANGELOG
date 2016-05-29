@@ -1,3 +1,6 @@
+0.3.1 (pre-alpha) - 2016/05/29
+    * Fixed: removed reference to deprecated Django REASON_PHRASES
+
 0.3 (pre-alpha) - 2016/03/05
     * Added: Redis authentication support with RT_REDIS_PASSWORD setting
     * Fixed: improved courier signal handling
