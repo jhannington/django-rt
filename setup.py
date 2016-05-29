@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='django-rt',
-    version='0.3',
+    version='0.3.1',
     description='A framework for implementing real-time APIs in Django web applications',
     author='James Hannington',
     author_email='jam.hann@gmail.com',
